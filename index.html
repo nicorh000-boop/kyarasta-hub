@@ -86,11 +86,11 @@
     .status.error { color: #dc2626; }
 
     .footer {
-      position: fixed;
-      bottom: 20px;
       font-size: clamp(.7rem, 3vw, .8rem);
       color: #a78bfa;
       letter-spacing: .04em;
+      text-align: center;
+      margin-top: 28px;
     }
   </style>
 </head>
@@ -102,9 +102,9 @@
 
     <button class="start-btn" id="start-btn" onclick="launch()">START</button>
     <div class="status" id="status"></div>
-  </div>
 
-  <div class="footer">5教科 × AIキャラクター学習</div>
+    <div class="footer">5教科 × AIキャラクター学習</div>
+  </div>
 
   <script>
     const GIST_ID = '13f071b9608f9c0dbcdd5971dd5a6181'
