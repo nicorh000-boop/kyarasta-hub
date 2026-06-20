@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="きゃらスタ">
+  <title>きゃらスタ</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      font-family: 'Hiragino Sans', 'Meiryo', sans-serif;
+      background: linear-gradient(160deg, #f5f3ff 0%, #ddd6fe 100%);
+      overflow: hidden;
+    }
+
+    .screen {
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px;
+      gap: 0;
+    }
+
+    .logo {
+      font-size: clamp(4rem, 20vw, 6rem);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 8vw, 2.4rem);
+      color: #1e1b4b;
+      font-weight: 900;
+      letter-spacing: .04em;
+      margin-bottom: 10px;
+    }
+
+    .sub {
+      font-size: clamp(.9rem, 4vw, 1.05rem);
+      color: #7c3aed;
+      line-height: 1.7;
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .start-btn {
+      width: min(320px, 86vw);
+      padding: clamp(16px, 5vw, 22px) 0;
+      background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);
+      color: #fff;
+      border: none;
+      border-radius: 18px;
+      font-size: clamp(1.2rem, 6vw, 1.5rem);
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(109,40,217,.4);
+      letter-spacing: .1em;
+      transition: transform .12s, box-shadow .12s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .start-btn:active {
+      transform: scale(.96);
+      box-shadow: 0 3px 10px rgba(109,40,217,.25);
+    }
+
+    .start-btn:disabled {
+      background: #c4b5fd;
+      box-shadow: none;
+    }
+
+    .status {
+      margin-top: 18px;
+      font-size: clamp(.85rem, 3.5vw, 1rem);
+      color: #8b5cf6;
+      text-align: center;
+      min-height: 1.4em;
+    }
+
+    .status.error { color: #dc2626; }
+
+    .footer {
+      position: fixed;
+      bottom: 20px;
+      font-size: clamp(.7rem, 3vw, .8rem);
+      color: #a78bfa;
+      letter-spacing: .04em;
+    }
+  </style>
+</head>
+<body>
+  <div class="screen">
+    <div class="logo">⭐</div>
+    <h1>きゃらスタ</h1>
+    <p class="sub">AI先生と一緒に<br>毎日コツコツ勉強しよう！</p>
+
+    <button class="start-btn" id="start-btn" onclick="launch()">START</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="footer">5教科 × AIキャラクター学習</div>
+
+  <script>
+    const GIST_ID = '13f071b9608f9c0dbcdd5971dd5a6181'
+
+    async function launch() {
+      const btn    = document.getElementById('start-btn')
+      const status = document.getElementById('status')
+      btn.disabled = true
+      status.textContent = '接続中...'
+      status.className = 'status'
+
+      try {
+        const res = await fetch(
+          `https://api.github.com/gists/${GIST_ID}?t=${Date.now()}`,
+          { headers: { Accept: 'application/vnd.github+json' } }
+        )
+        if (!res.ok) throw new Error(`status ${res.status}`)
+        const data = await res.json()
+        const content = data.files['kyarasta-url.json']?.content
+        if (!content) throw new Error('file not found')
+        const { url } = JSON.parse(content)
+        if (!url) throw new Error('no-url')
+        status.textContent = '接続完了！'
+        setTimeout(() => { window.location.href = url }, 300)
+      } catch (e) {
+        status.textContent = e.message === 'no-url'
+          ? 'サーバーが起動していません。先生に連絡してね。'
+          : '接続に失敗しました。もう一度試してね。'
+        status.className = 'status error'
+        btn.disabled = false
+      }
+    }
+  </script>
+</body>
+</html>
